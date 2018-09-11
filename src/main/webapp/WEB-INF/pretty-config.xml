@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<pretty-config xmlns="http://ocpsoft.org/schema/rewrite-config-prettyfaces" 
+               xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+               xsi:schemaLocation="http://ocpsoft.org/schema/rewrite-config-prettyfaces
+                      http://ocpsoft.org/xml/ns/prettyfaces/rewrite-config-prettyfaces.xsd">
+
+    <url-mapping id="index">
+        <pattern value="/index" />
+        <view-id value="/faces/index.xhtml" />
+    </url-mapping>
+    
+    <url-mapping id="auth">
+        <pattern value="/auth" />
+        <view-id value="/faces/auth.xhtml" />
+    </url-mapping>
+    
+    <url-mapping id="admin">
+        <pattern value="/admin" />
+        <view-id value="/faces/admin.xhtml" />
+    </url-mapping>
+    
+    <url-mapping id="newme">
+        <pattern value="/newme" />
+        <view-id value="/faces/newmeasurement.xhtml" />
+    </url-mapping>
+    
+    <url-mapping id="tail">
+        <pattern value="/tail/#{measurementId : tailController.tailMeasurementId}" />
+        <view-id value="/faces/tail.xhtml" />
+        <action>#{tailController.prepareTail}</action>
+    </url-mapping>
+    
+    <url-mapping id="head">
+        <pattern value="/head/#{measurementId : headController.headMeasurementId}" />
+        <view-id value="/faces/head.xhtml" />
+        <action>#{headController.prepareHead}</action>
+    </url-mapping>
+
+</pretty-config>

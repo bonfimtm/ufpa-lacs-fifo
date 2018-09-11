@@ -1,0 +1,112 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+      xmlns:pt="http://xmlns.jcp.org/jsf/passthrough"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <h:head>
+        <title>FIFO - Cauda da Fila</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no, user-scalable=no"/>
+        <!-- Bootstrap -->
+        <!-- <link href="css/bootstrap.min.css" rel="stylesheet"/>
+        <link href="../css/bootstrap.min.css" rel="stylesheet"/> -->
+        <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css"/>
+
+        <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+        <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+        <!--[if lt IE 9]>
+          <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+          <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+        <![endif]-->
+    </h:head>
+    <h:body>
+        <div class="container">
+            <div class="col-lg-6 col-md-8 col-sm-10 col-xs-12">
+                <c:if test="#{authController.authorized}">
+                    
+                    <div class="row">
+                        <div class="col-md-3">
+                            <h3><h:link class="btn btn-default" outcome="/admin?faces-redirect=true"><span class="glyphicon glyphicon-chevron-left"></span> Administração</h:link></h3>
+                        </div>
+                        <div class="col-md-9">
+                            <h2>Monitor de Cauda</h2>
+                        </div>
+                    </div>
+
+                    <c:if test="#{tailController.tailMeasurement != null}">
+                        <h3>Número da medição: #{tailController.tailMeasurement.id}</h3>
+
+                        <h3>Nome da medição: #{tailController.tailMeasurement.name}</h3>
+
+                        <h:form id="tail-form">
+
+                            <p:messages/>
+
+                            <div class="input-group">
+                                <p:inputText styleClass="form-control"
+                                             pt:placeholder="Código"
+                                             required="true"
+                                             requiredMessage="Código é nescessário"
+                                             value="#{tailController.tailWaitingCode}"
+                                             tabindex="0"
+                                             autocomplete="off"
+                                             validatorMessage="Número inválido">
+                                    <f:validateDoubleRange minimum="1" maximum="2147483647" />
+                                </p:inputText>
+                                <span class="input-group-btn">
+                                    <p:commandLink styleClass="btn btn-info"
+                                                   actionListener="#{tailController.put}"
+                                                   update="tail-form"
+                                                   validateClient="true">
+                                        <span class="glyphicon glyphicon-arrow-right"></span> Colocar na fila
+                                    </p:commandLink>
+                                </span>
+                            </div>
+                            <p:commandButton style="display: none;"
+                                             actionListener="#{tailController.put}"
+                                             update="tail-form"
+                                             validateClient="true"/>
+                            <c:if test="#{tailController.lastTailWaitingCode != null}">
+                                <br/>
+                                <br/>
+                                <p:commandLink styleClass="btn btn-default"
+                                               actionListener="#{tailController.putNext}"
+                                               immediate="true"
+                                               update="tail-form">
+                                    <span class="glyphicon glyphicon-arrow-right"></span> #{tailController.nextOnTail} colocar na fila
+                                </p:commandLink>
+                            </c:if>
+                        </h:form>
+                    </c:if>
+
+                </c:if>
+
+                <c:if test="#{authController.authorized == false}">
+                    <h2>Você não está autorizado.</h2>
+                </c:if>
+            </div>
+
+
+            <div class="col-lg-offset-5 col-md-offset-7 col-sm-offset-9 col-xs-offset-11">
+                <p:ajaxStatus id="globalAjaxStatusPanel"
+                              style="box-shadow: 0px 0px 0px !important;">
+                    <f:facet name="start">
+                        <img src="../img/ajaxloading.gif" alt=""
+                             style="width:16px; height:16px; margin-top: 10px; margin-bottom: 10px;"/>
+                    </f:facet>
+                    <f:facet name="complete">
+                    </f:facet>
+                </p:ajaxStatus>
+
+                <p:sticky target="globalAjaxStatusPanel"/>
+            </div>
+
+        </div>
+
+        <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
+    </h:body>
+</html>
+

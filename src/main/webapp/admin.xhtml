@@ -1,0 +1,223 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+      xmlns:pt="http://xmlns.jcp.org/jsf/passthrough"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <h:head>
+        <title>FIFO - Administração</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no, user-scalable=no"/>
+        <!-- Bootstrap -->
+        <!-- <link href="css/bootstrap.min.css" rel="stylesheet"/>
+        <link href="../css/bootstrap.min.css" rel="stylesheet"/> -->
+        <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css"/>
+
+        <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+        <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+        <!--[if lt IE 9]>
+          <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+          <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+        <![endif]-->
+    </h:head>
+    <h:body>
+        <div class="container">
+            <div class="col-md-12">
+                <c:if test="#{authController.authorized}">
+
+                    <div class="row">
+                        <div class="col-md-10">
+                            <h1>Administração</h1>
+                        </div>
+                        <div class="col-md-2">
+                            <h:form>
+                                <h1>
+                                    <h:commandLink styleClass="btn btn-default"
+                                                   action="#{authController.unAuth}">
+                                        <span class="glyphicon glyphicon-log-out"></span> Sair
+                                    </h:commandLink>
+                                </h1>
+                            </h:form>  
+                        </div>
+                    </div>
+
+                    <p:messages/>
+
+                    <h3>Medições</h3>
+
+                    <table class="table table-striped table-bordered">
+                        <c:if test="#{adminController.measurements == null || adminController.measurements.size() == 0}">
+                            <thead><tr><td>Sem medições</td></tr></thead>
+                        </c:if>
+                        <c:if test="#{!(adminController.measurements == null || adminController.measurements.size() == 0)}">
+                            <thead>
+                                <tr>
+                                    <th>Id</th>
+                                    <th>Nome</th>
+                                    <th>Data e Hora</th>
+                                    <th>Clientes sem ficha</th>
+                                    <th>Mostrando</th>
+                                    <th>Opções</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <c:forEach items="#{adminController.measurements}" var="item">
+                                    <tr>
+                                        <td>#{item.id}</td>
+                                        <td>#{item.name}</td>
+                                        <td>#{utilBean.maskDateAndTime(item.dateAndTime)}</td>
+                                        <td>#{item.extraCheaters}</td>
+                                        <td>#{utilBean.maskBoolean(item.showing)}</td>
+                                        <td>
+                                            <h:form>
+                                                <h:commandLink styleClass="btn btn-default btn-sm"
+                                                               title="Mostrar/Ocultar para clientes"
+                                                               action="#{adminController.showToClients(item)}">
+                                                    <span class="glyphicon glyphicon-eye-open"></span>
+                                                </h:commandLink>
+                                                &nbsp;
+                                                <h:commandLink styleClass="btn btn-info btn-sm"
+                                                               title="Monitorar Cauda"
+                                                               action="#{tailController.manageTail(item.id)}">
+                                                    <span class="glyphicon glyphicon-arrow-right"></span>
+                                                </h:commandLink>
+                                                &nbsp;
+                                                <h:commandLink styleClass="btn btn-warning btn-sm"
+                                                               title="Monitorar Cabeça"
+                                                               action="#{headController.manageHead(item.id)}">
+                                                    <span class="glyphicon glyphicon-ok"></span>
+                                                </h:commandLink>
+                                                &nbsp;
+                                                <h:commandLink styleClass="btn btn-default btn-sm"
+                                                               title="Baixar Resultados"
+                                                               action="#{adminController.mesurementReport(item)}">
+                                                    <span class="glyphicon glyphicon-download"></span>
+                                                </h:commandLink>
+                                                &nbsp;
+                                                <p:commandLink styleClass="btn btn-danger btn-sm"
+                                                               title="Exluir Medição"
+                                                               actionListener="#{adminController.prepareDeleteMesurement(item)}"
+                                                               pt:data-toggle="modal" pt:data-target="#delModal">
+                                                               <span class="glyphicon glyphicon-remove-circle"></span>
+                                                </p:commandLink>
+                                            </h:form>
+                                        </td>
+                                    </tr>
+                                </c:forEach>
+                            </tbody>
+                        </c:if>
+                    </table>
+
+                    <h:form id="schoolar-itens-form">
+                        <h:selectBooleanCheckbox id="show-schoolar-itens-checkbox" value="#{indexController.showSchoolarItens}">
+                            <p:ajax update="schoolar-itens-form"/>
+                        </h:selectBooleanCheckbox>
+                        &nbsp;
+                        <h:outputLabel value="Mostrar itens escolares" for="show-schoolar-itens-checkbox"/>
+                    </h:form>
+
+                    <h:form>
+                        <br/>
+                        <h:commandLink styleClass="btn btn-primary"
+                                       value="Nova Medição"
+                                       action="/faces/newmeasurement.xhtml?faces-redirect=true"/>
+                    </h:form>
+
+                    <br/>
+                    <br/>
+                    <h:link outcome="/faces/index.xhtml?faces-redirect=true" value="Estatísticas da fila"/>
+
+                </c:if>
+            </div>
+
+            <div class="col-md-offset-11">
+                <p:ajaxStatus id="globalAjaxStatusPanel"
+                              style="box-shadow: 0px 0px 0px !important;">
+                    <f:facet name="start">
+                        <img src="img/ajaxloading.gif" alt=""
+                             style="width:16px; height:16px; margin-top: 10px; margin-bottom: 10px;"/>
+                    </f:facet>
+                    <f:facet name="complete">
+                    </f:facet>
+                </p:ajaxStatus>
+
+                <p:sticky target="globalAjaxStatusPanel"/>
+            </div>
+
+        </div>
+
+        <c:if test="#{authController.authorized}">
+            <!-- Delete Measurement Modal-->
+            <div class="modal fade" id="delModal" tabindex="-1" role="dialog" aria-labelledby="delModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <h:form id="delform">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                                <h4 class="modal-title" id="delModalLabel">Excluir Medição</h4>
+                            </div>
+                            <div class="modal-body">
+                                <p>Deseja excluir definitivamente esta medição?</p>
+                            </div>
+                            <div class="modal-footer">
+                                <p:ajaxStatus style="width:16px;height:16px;" id="ajaxStatusPanel">
+                                    <f:facet name="start">
+                                        <br/>
+                                        <img src="img/ajaxloading.gif" alt=""/>
+                                    </f:facet>
+                                    <f:facet name="complete">
+                                    </f:facet>
+                                </p:ajaxStatus>
+                                <p:commandLink value="Fechar"
+                                               action="#{adminController.cancelDeleteMesurement}"
+                                               styleClass="btn btn-default btn-sm" pt:data-dismiss="modal"
+                                               immediate="true"/>
+                                <p:commandLink value="Excluir Medição"
+                                               action="#{adminController.deleteMesurement}"
+                                               styleClass="btn btn-danger btn-sm"
+                                               immediate="true"
+                                               ajax="false"/>
+                            </div>
+                        </h:form>
+                    </div>
+                </div>
+            </div>
+        </c:if>
+
+        <c:if test="#{authController.authorized == false}">
+
+            <div class="container">
+                <div class="col-lg-6 col-md-8 col-sm-10 col-xs-12">
+                    <h1>Digite a senha de administração</h1>
+
+                    <p:messages/>
+
+                    <h:form>
+                        <h:inputSecret styleClass="form-control"
+                                       maxlength="45"
+                                       value="#{authController.passwd}"
+                                       tabindex="0"/>
+                        <p:captcha label="Captcha" language="pt" theme="white"
+                                   validatorMessage="Os caracteres digitados não conferem!"
+                                   rendered="#{authController.attempts > 3}"
+                                   required="true"
+                                   requiredMessage="É necessário informar os caracteres."/>
+                        <br/>
+                        <h:commandButton style="display: none;"
+                                         styleClass="btn btn-primary"
+                                         action="#{authController.auth}"/>
+                        <h:commandLink styleClass="btn btn-primary"
+                                       action="#{authController.auth}">
+                            <span class="glyphicon glyphicon-log-in"></span> Entrar
+                        </h:commandLink>
+                    </h:form>
+                </div>
+            </div>
+        </c:if>
+
+        <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
+    </h:body>
+</html>
+
